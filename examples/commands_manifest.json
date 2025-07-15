@@ -1,0 +1,486 @@
+{
+  "manifest_version": "1.0",
+  "generated": "2025-07-15T00:00:00Z",
+  "methodology": {
+    "name": "Manifest-Driven Development Workflow",
+    "version": "2.0",
+    "description": "Systematic AI-assisted development with explicit state tracking and validation"
+  },
+  "commands": {
+    "process_task": {
+      "version": "2.0",
+      "status": "stable",
+      "testing_status": "production_tested",
+      "architecture": "human_orchestrated",
+      "purpose": "Task preparation and planning",
+      "stage": "task_initialization",
+      "description": "Prepare task for implementation with baseline loading and expected manifest generation",
+      "file": "commands/process_task.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "codebase_manifest.json",
+          "tasks/tasks.json"
+        ],
+        "required_directories": [
+          "tasks/",
+          "tasks/prepared/"
+        ],
+        "git_status": "any"
+      },
+      "inputs": {
+        "format": "Task-X.X",
+        "example": "Task-1.1",
+        "validation": "Must exist in tasks.json"
+      },
+      "outputs": {
+        "primary": "tasks/prepared/[TASK_ID].json",
+        "side_effects": ["baseline_manifest_loading", "expected_manifest_generation"]
+      },
+      "critical_validations": [
+        "Baseline MUST be loaded from file, not generated",
+        "Expected manifest MUST build logically from baseline",
+        "Implementation notes MUST be comprehensive"
+      ],
+      "common_failures": [
+        "baseline_generation_instead_of_loading",
+        "task_not_found_in_tasks_json",
+        "incomplete_expected_manifest"
+      ],
+      "dependencies": {
+        "prerequisites": [],
+        "follows": [],
+        "enables": ["implement_task"]
+      }
+    },
+    "implement_task": {
+      "version": "2.0",
+      "status": "stable", 
+      "testing_status": "production_tested",
+      "architecture": "human_orchestrated",
+      "purpose": "Code implementation",
+      "stage": "task_execution",
+      "description": "Implement prepared task according to expected manifest and implementation plan",
+      "file": "commands/implement_task.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "tasks/prepared/[TASK_ID].json"
+        ],
+        "required_directories": [
+          "tasks/prepared/"
+        ],
+        "git_status": "clean_or_task_changes"
+      },
+      "inputs": {
+        "format": "Task-X.X",
+        "example": "Task-1.1", 
+        "validation": "Corresponding prepared file must exist"
+      },
+      "outputs": {
+        "primary": "code_changes",
+        "side_effects": ["file_creation", "file_modification", "dependency_installation"]
+      },
+      "critical_validations": [
+        "All planned files MUST be created",
+        "All planned modifications MUST be completed",
+        "Code MUST compile/build successfully"
+      ],
+      "common_failures": [
+        "build_failures",
+        "missing_planned_files",
+        "regression_in_existing_functionality"
+      ],
+      "dependencies": {
+        "prerequisites": ["process_task"],
+        "follows": ["process_task"],
+        "enables": ["check_task"]
+      }
+    },
+    "check_task": {
+      "version": "2.0",
+      "status": "stable",
+      "testing_status": "production_tested", 
+      "architecture": "human_orchestrated",
+      "purpose": "Implementation validation",
+      "stage": "task_validation",
+      "description": "Validate implementation through three-way manifest comparison",
+      "file": "commands/check_task.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "tasks/prepared/[TASK_ID].json"
+        ],
+        "required_directories": [
+          "tasks/validation/"
+        ],
+        "git_status": "implementation_complete"
+      },
+      "inputs": {
+        "format": "Task-X.X",
+        "example": "Task-1.1",
+        "validation": "Implementation must be completed"
+      },
+      "outputs": {
+        "primary": "tasks/validation/[TASK_ID]-validation.json",
+        "side_effects": ["actual_manifest_generation", "three_way_comparison"]
+      },
+      "critical_validations": [
+        "Three manifests MUST be loaded: baseline (from file), expected (from file), actual (generated)",
+        "All three comparisons MUST be performed",
+        "Differences MUST be categorized by severity"
+      ],
+      "common_failures": [
+        "baseline_generated_instead_of_loaded",
+        "missing_three_way_comparison",
+        "incomplete_difference_analysis"
+      ],
+      "dependencies": {
+        "prerequisites": ["process_task", "implement_task"],
+        "follows": ["implement_task"],
+        "enables": ["commit_task", "resolve_mismatch"]
+      }
+    },
+    "commit_task": {
+      "version": "2.0",
+      "status": "stable",
+      "testing_status": "production_tested",
+      "architecture": "human_orchestrated", 
+      "purpose": "Task completion and baseline update",
+      "stage": "task_completion",
+      "description": "Commit successful implementation and update baseline manifest",
+      "file": "commands/commit_task.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "tasks/validation/[TASK_ID]-validation.json"
+        ],
+        "required_directories": [
+          "tasks/completed/"
+        ],
+        "git_status": "initialized",
+        "validation_status": ["PASS", "MINOR_ISSUES"]
+      },
+      "inputs": {
+        "format": "Task-X.X",
+        "example": "Task-1.1",
+        "validation": "Successful validation report required"
+      },
+      "outputs": {
+        "primary": "git_commit",
+        "side_effects": [
+          "codebase_manifest_update",
+          "task_archival",
+          "baseline_establishment"
+        ]
+      },
+      "critical_validations": [
+        "Validation status MUST be acceptable",
+        "codebase_manifest.json MUST be updated with actual state",
+        "Git commit MUST include all task-related changes"
+      ],
+      "common_failures": [
+        "validation_not_passed",
+        "manifest_update_failed",
+        "git_commit_failed"
+      ],
+      "dependencies": {
+        "prerequisites": ["process_task", "implement_task", "check_task"],
+        "follows": ["check_task"],
+        "enables": ["compact_after_task"]
+      }
+    },
+    "resolve_mismatch": {
+      "version": "2.0",
+      "status": "stable",
+      "testing_status": "field_tested",
+      "architecture": "human_orchestrated_interactive",
+      "purpose": "Issue resolution",
+      "stage": "problem_resolution", 
+      "description": "Resolve discrepancies between expected and actual implementation",
+      "file": "commands/resolve_mismatch.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "tasks/validation/[TASK_ID]-validation.json",
+          "tasks/prepared/[TASK_ID].json"
+        ],
+        "required_directories": [
+          "tasks/resolutions/"
+        ],
+        "validation_status": ["MAJOR_ISSUES", "CRITICAL_FAILURE"]
+      },
+      "inputs": {
+        "format": "Task-X.X",
+        "example": "Task-1.1",
+        "validation": "Validation report showing major issues required"
+      },
+      "outputs": {
+        "primary": "tasks/resolutions/[TASK_ID]-resolution.json",
+        "side_effects": ["code_fixes", "manifest_updates", "new_task_creation"]
+      },
+      "critical_validations": [
+        "All critical differences MUST be addressed",
+        "Resolution decisions MUST be documented",
+        "Post-resolution validation MUST be planned"
+      ],
+      "common_failures": [
+        "incomplete_resolution",
+        "poor_resolution_documentation",
+        "new_issues_introduced"
+      ],
+      "dependencies": {
+        "prerequisites": ["process_task", "implement_task", "check_task"],
+        "follows": ["check_task"],
+        "enables": ["check_task", "commit_task"]
+      },
+      "interaction_type": "requires_human_decisions"
+    },
+    "compact_after_task": {
+      "version": "2.0",
+      "status": "stable",
+      "testing_status": "beta_tested",
+      "architecture": "context_optimization",
+      "purpose": "Context management",
+      "stage": "workflow_optimization",
+      "description": "Compact conversation context while preserving essential project state",
+      "file": "commands/compact_after_task.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "tasks/completed/[TASK_ID].json",
+          "codebase_manifest.json"
+        ],
+        "required_directories": [],
+        "git_status": "clean",
+        "task_status": "completed_and_committed"
+      },
+      "inputs": {
+        "format": "Task-X.X",
+        "example": "Task-1.1",
+        "validation": "Task must be successfully completed"
+      },
+      "outputs": {
+        "primary": "context_compact_execution",
+        "side_effects": ["new_claude_session", "context_prompt_generation"]
+      },
+      "critical_validations": [
+        "Task completion MUST be verified",
+        "Context prompt MUST be comprehensive",
+        "Compact execution MUST succeed"
+      ],
+      "common_failures": [
+        "task_not_completed",
+        "incomplete_context_prompt",
+        "compact_command_failed"
+      ],
+      "dependencies": {
+        "prerequisites": ["commit_task"],
+        "follows": ["commit_task"],
+        "enables": ["new_development_session"]
+      },
+      "shell_command": "claude --compact"
+    },
+    "commit_task_then_compact": {
+      "version": "2.0",
+      "status": "stable",
+      "testing_status": "beta_tested",
+      "architecture": "two_phase_operation",
+      "purpose": "Task completion and context optimization",
+      "stage": "workflow_optimization",
+      "description": "Combined commit and context compact for maximum development efficiency",
+      "file": "commands/commit_task_then_compact.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "tasks/validation/[TASK_ID]-validation.json",
+          "codebase_manifest.json",
+          "tasks/tasks.json"
+        ],
+        "required_directories": [
+          "tasks/completed/"
+        ],
+        "git_status": "initialized",
+        "validation_status": ["PASS", "MINOR_ISSUES"]
+      },
+      "inputs": {
+        "format": "Task-X.X",
+        "example": "Task-1.1",
+        "validation": "Successful validation report required"
+      },
+      "outputs": {
+        "primary": "git_commit_and_context_compact",
+        "side_effects": [
+          "codebase_manifest_update",
+          "task_archival", 
+          "new_claude_session",
+          "context_prompt_generation"
+        ]
+      },
+      "critical_validations": [
+        "Phase 1 (commit) MUST succeed before Phase 2 (compact)",
+        "All commit validations MUST pass",
+        "Context compact MUST execute only after successful commit"
+      ],
+      "common_failures": [
+        "commit_phase_failed",
+        "compact_executed_despite_commit_failure",
+        "incomplete_two_phase_execution"
+      ],
+      "dependencies": {
+        "prerequisites": ["process_task", "implement_task", "check_task"],
+        "follows": ["check_task"],
+        "enables": ["new_development_session"]
+      },
+      "shell_command": "claude --compact",
+      "recommended_usage": "primary_workflow_optimization"
+    },
+    "update_final_manifest": {
+      "version": "2.0",
+      "status": "stable",
+      "testing_status": "field_tested",
+      "architecture": "architectural_governance",
+      "purpose": "Architectural evolution tracking",
+      "stage": "project_governance",
+      "description": "Update architectural target based on implementation learnings",
+      "file": "commands/update_final_manifest.md",
+      "requirements": {
+        "project_stage": "existing_project",
+        "required_files": [
+          "codebase_manifest.json",
+          "docs/proposed_final_manifest.json",
+          "docs/manifest_evolution.md"
+        ],
+        "required_directories": [
+          "docs/"
+        ],
+        "git_status": "clean_or_documentation_changes"
+      },
+      "inputs": {
+        "format": "trigger_description",
+        "example": "Phase 2 completion",
+        "validation": "Clear reason for architectural review required"
+      },
+      "outputs": {
+        "primary": "docs/proposed_final_manifest.json",
+        "side_effects": [
+          "manifest_evolution_log_update",
+          "architectural_documentation_updates"
+        ]
+      },
+      "critical_validations": [
+        "Architectural changes MUST be well-documented",
+        "Evolution rationale MUST be captured",
+        "Impact assessment MUST be completed"
+      ],
+      "common_failures": [
+        "poor_change_documentation",
+        "missing_evolution_rationale",
+        "incomplete_impact_assessment"
+      ],
+      "dependencies": {
+        "prerequisites": [],
+        "follows": ["major_milestones", "architectural_discoveries"],
+        "enables": ["informed_architectural_decisions"]
+      },
+      "trigger_types": [
+        "milestone_completion",
+        "architectural_discovery", 
+        "drift_detection",
+        "periodic_review"
+      ],
+      "usage_frequency": "periodic"
+    }
+  },
+  "command_categories": {
+    "core_workflow": {
+      "description": "Essential commands for standard development workflow",
+      "commands": ["process_task", "implement_task", "check_task", "commit_task"],
+      "sequence": "linear",
+      "frequency": "every_task"
+    },
+    "problem_resolution": {
+      "description": "Commands for handling implementation issues",
+      "commands": ["resolve_mismatch"],
+      "sequence": "conditional",
+      "frequency": "as_needed"
+    },
+    "context_optimization": {
+      "description": "Commands for managing conversation context efficiency",
+      "commands": ["compact_after_task", "commit_task_then_compact"],
+      "sequence": "alternative",
+      "frequency": "regular"
+    },
+    "architectural_governance": {
+      "description": "Commands for managing architectural evolution",
+      "commands": ["update_final_manifest"],
+      "sequence": "periodic",
+      "frequency": "milestone_based"
+    }
+  },
+  "workflow_patterns": {
+    "standard_task": {
+      "description": "Basic task completion workflow",
+      "sequence": ["process_task", "implement_task", "check_task", "commit_task"],
+      "estimated_time": "varies_by_task",
+      "context_impact": "accumulating"
+    },
+    "optimized_task": {
+      "description": "Task completion with automatic context optimization",
+      "sequence": ["process_task", "implement_task", "check_task", "commit_task_then_compact"],
+      "estimated_time": "varies_by_task + 5_minutes",
+      "context_impact": "reset_optimized"
+    },
+    "problem_resolution": {
+      "description": "Workflow when validation issues occur",
+      "sequence": ["process_task", "implement_task", "check_task", "resolve_mismatch", "check_task", "commit_task"],
+      "estimated_time": "varies_by_complexity",
+      "context_impact": "accumulating"
+    }
+  },
+  "compatibility_matrix": {
+    "project_stages": {
+      "new_project": {
+        "supported_commands": ["process_task", "implement_task", "check_task", "commit_task"],
+        "requirements": ["initial_codebase_manifest", "tasks_json_setup"]
+      },
+      "existing_project": {
+        "supported_commands": "all",
+        "requirements": ["established_file_structure"]
+      },
+      "legacy_migration": {
+        "supported_commands": ["codebase_analysis", "process_task", "implement_task", "check_task", "commit_task"],
+        "requirements": ["manifest_generation_from_existing_code"]
+      }
+    },
+    "git_requirements": {
+      "initialized": ["commit_task", "commit_task_then_compact"],
+      "clean": ["compact_after_task"],
+      "any": ["process_task", "implement_task", "check_task", "resolve_mismatch", "update_final_manifest"]
+    }
+  },
+  "version_evolution": {
+    "v1_deprecated": {
+      "description": "Original sub-agent orchestration approach",
+      "issues": ["baseline_generation_bug", "sub_agent_complexity", "error_cascades"],
+      "migration_path": "use_v2_equivalents"
+    },
+    "v2_current": {
+      "description": "Human-orchestrated workflow with explicit validation",
+      "improvements": ["baseline_loading_enforcement", "three_way_validation", "context_optimization"],
+      "status": "production_ready"
+    }
+  },
+  "setup_requirements": {
+    "minimal_project": {
+      "files": ["codebase_manifest.json", "tasks/tasks.json"],
+      "directories": ["tasks/", "tasks/prepared/", "tasks/validation/", "tasks/completed/"],
+      "git": "initialized"
+    },
+    "full_governance": {
+      "files": ["codebase_manifest.json", "tasks/tasks.json", "docs/proposed_final_manifest.json", "docs/manifest_evolution.md"],
+      "directories": ["tasks/", "docs/", "tasks/prepared/", "tasks/validation/", "tasks/completed/", "tasks/resolutions/"],
+      "git": "initialized_with_proper_gitignore"
+    }
+  }
+}
